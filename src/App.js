@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
-import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -9,23 +8,12 @@ function App() {
   const [profileData, setProfileData] = useState(null);
 
   function getData() {
-    axios({
-      method: 'GET',
-      url: '/profile',
-    })
+    axios.get('/profile')
       .then((response) => {
-        const res = response.data;
-        setProfileData({
-          profile_name: res.name,
-          about_me: res.about,
-        });
+        setProfileData(response.data); // Set profileData to the array of actors
       })
       .catch((error) => {
-        if (error.response) {
-          console.log(error.response);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        }
+        console.error('Error fetching data:', error);
       });
   }
 
@@ -51,22 +39,15 @@ function App() {
         </Container>
       </Navbar>
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-
-        <p>To get your profile details:</p>
+        <p>To see the table details:</p>
         <button onClick={getData}>Click me</button>
-        {profileData && (
-          <div>
-            <p>Profile name: {profileData.profile_name}</p>
-            <p>About me: {profileData.about_me}</p>
+        {profileData && profileData.map((actor, index) => (
+          <div key={index}>
+            <p>Actor ID: {actor.actor_id}</p>
+            <p>First Name: {actor.first_name}</p>
+            <p>Last Name: {actor.last_name}</p>
           </div>
-        )}
+        ))}
       </header>
     </div>
   );
