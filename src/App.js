@@ -1,73 +1,136 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import CardGroup from 'react-bootstrap/CardGroup';
+import Navbar from 'react-bootstrap/Navbar';
 import axios from 'axios';
-import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
-import logo from './logo.svg';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+
+function NavBar() {
+  return (
+    <Navbar bg="dark" data-bs-theme="dark">
+      <Container>
+        <Navbar.Brand href="#home">CS 490 Project</Navbar.Brand>
+        <Nav className="me-auto">
+          <Nav.Link href="#home">Home</Nav.Link>
+          <Nav.Link href="#features">Customer Page</Nav.Link>
+          <Nav.Link href="#pricing">Films Page</Nav.Link>
+        </Nav>
+      </Container>
+    </Navbar>
+  );
+}
+
+function Movie_Card({ title, description, release_year, language, duration, rating, special_features, times_rented, last_update }) {
+  const [showDetails, setShowDetails] = useState(false);
+  return (
+    <CardGroup>
+      <Card style={{ width: '18rem' }}>
+        <Card.Body>
+          <Card.Title>{title}</Card.Title>
+          <Card.Text>
+            {description}
+          </Card.Text>
+          {showDetails && (
+            <div>
+              <p>Release Year: {release_year}</p>
+              <p>Language: {language}</p>
+              <p>Duration: {duration} minutes</p>
+              <p>Rating: {rating}</p>
+              <p>Special Features: {special_features}</p>
+              <p>Times Rented: {times_rented}</p>
+            </div>
+          )}
+          <Button variant="primary" onClick={() => setShowDetails(!showDetails)}>
+          {showDetails ? 'Hide Details' : 'Show Details'}
+        </Button>
+        </Card.Body>
+        <Card.Footer>
+          <small className="text-muted"> {last_update} </small>
+        </Card.Footer>
+      </Card>
+    </CardGroup>
+  );
+}
+
+function Actor_Card({ first_name, last_name }) {
+  return (
+    <CardGroup>
+      <Card style={{ width: '18rem' }}>
+        <Card.Body>
+          <Card.Title>{first_name} {last_name}</Card.Title>
+          <Card.Text>
+            {/* {description} */}
+          </Card.Text>
+          <Button variant="primary">More Info</Button>
+        </Card.Body>
+      </Card>
+    </CardGroup>
+  );
+}
 
 function App() {
-  const [profileData, setProfileData] = useState(null);
+  // Returns the top 5 most rented movies + details
+  const [top_five_films, set_top_five_films] = useState([]);
+  // Returns the top 5 most rented movies + details
+  const [top_five_actors, set_top_five_actors] = useState([]);
+  // As a user I want to view a list of all customers + customer details
+  const [customers, set_customers] = useState([]);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   function getData() {
-    axios({
-      method: 'GET',
-      url: '/profile',
-    })
+    axios.get('/sakila') 
       .then((response) => {
-        const res = response.data;
-        setProfileData({
-          profile_name: res.name,
-          about_me: res.about,
-        });
+        set_top_five_films(response.data.top_five_films);
+        set_top_five_actors(response.data.top_five_actors);
+        set_customers(response.data.customers);
       })
       .catch((error) => {
-        if (error.response) {
-          console.log(error.response);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        }
+        console.error('Error fetching data:', error);
       });
   }
 
   return (
     <div className="App">
-      <Navbar expand="lg" className="bg-body-tertiary">
-        <Container>
-          <Navbar.Brand href="#home">CS 490 Individual Project</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link href="#home">Home</Nav.Link>
-              <Nav.Link href="#link">Link</Nav.Link>
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-              </NavDropdown>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
 
-        <p>To get your profile details:</p>
-        <button onClick={getData}>Click me</button>
-        {profileData && (
-          <div>
-            <p>Profile name: {profileData.profile_name}</p>
-            <p>About me: {profileData.about_me}</p>
-          </div>
-        )}
-      </header>
+      <div className="NavBar">
+        <NavBar/>
+      </div>
+
+      <div id = "top_movies">
+        <h1><br/>Top 5 Rented Films of All Time</h1>
+        <CardGroup>
+        {top_five_films.map((film, index) => (
+              <Movie_Card
+              key={index}
+              title={film.title}
+              description={film.description}
+              release_year={film.release_year}
+              language={film.language} 
+              duration={film.duration} 
+              rating={film.rating}
+              special_features={film.special_features}
+              times_rented={film.times_rented} 
+              last_update={film.last_update} 
+            />
+              ))}
+        </CardGroup>
+      </div>
+
+      <div id = "top_actors">
+        <h1><br/>Top 5 Actors That Feature in Films We Have in Store</h1>
+        <CardGroup>
+        {top_five_actors.map((actor, index) => (
+              <Actor_Card first_name={actor.first_name} last_name={actor.last_name}/>
+              ))}
+        </CardGroup>
+      </div>
+
     </div>
   );
 }
