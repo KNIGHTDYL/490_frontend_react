@@ -8,7 +8,7 @@ import Card from 'react-bootstrap/Card';
 import CardGroup from 'react-bootstrap/CardGroup';
 import Navbar from 'react-bootstrap/Navbar';
 
-function Movie_Card({ title, description, release_year, language, duration, rating, special_features, times_rented, last_update }) {
+function MovieCard({ title, description, releaseYear, language, duration, rating, specialFeatures, timesRented, lastUpdate }) {
   const [showDetails, setShowDetails] = useState(false);
   return (
     <CardGroup>
@@ -20,36 +20,55 @@ function Movie_Card({ title, description, release_year, language, duration, rati
           </Card.Text>
           {showDetails && (
             <div>
-              <p>Release Year: {release_year}</p>
+              <p>Release Year: {releaseYear}</p>
               <p>Language: {language}</p>
               <p>Duration: {duration} minutes</p>
               <p>Rating: {rating}</p>
-              <p>Special Features: {special_features}</p>
-              <p>Times Rented: {times_rented}</p>
+              <p>Special Features: {specialFeatures}</p>
+              <p>Times Rented: {timesRented}</p>
             </div>
           )}
           <Button variant="primary" onClick={() => setShowDetails(!showDetails)}>
-          {showDetails ? 'Hide Details' : 'Show Details'}
-        </Button>
+            {showDetails ? 'Hide Details' : 'Show Details'}
+          </Button>
         </Card.Body>
         <Card.Footer>
-          <small className="text-muted"> {last_update} </small>
+          <small className="text-muted"> {lastUpdate} </small>
         </Card.Footer>
       </Card>
     </CardGroup>
   );
 }
 
-function Actor_Card({ first_name, last_name }) {
+function ActorCard({ firstName, lastName, topMovies }) {
+  const [showMovies, setShowMovies] = useState(false);
+
   return (
     <CardGroup>
       <Card style={{ width: '18rem' }}>
         <Card.Body>
-          <Card.Title>{first_name} {last_name}</Card.Title>
-          <Card.Text>
-            {"Description would go here.... But there's nothing to put"}
-          </Card.Text>
-          <Button variant="primary">More Info</Button>
+          <Card.Title>{firstName} {lastName}</Card.Title>
+          <Button variant="primary" onClick={() => setShowMovies(!showMovies)}>
+            {showMovies ? 'Hide Movies' : 'More Info'}
+          </Button>
+          {showMovies && (
+            <div>
+              {topMovies.map((movie, index) => (
+                <MovieCard 
+                  key={index} 
+                  title={movie.title}
+                  description={movie.description}
+                  releaseYear={movie.release_year}
+                  language={movie.language_id} 
+                  duration={movie.length} 
+                  rating={movie.rating}
+                  specialFeatures={movie.special_features}
+                  timesRented={movie.rental_count} 
+                  lastUpdate={movie.last_update} 
+                />
+              ))}
+            </div>
+          )}
         </Card.Body>
       </Card>
     </CardGroup>
@@ -57,26 +76,43 @@ function Actor_Card({ first_name, last_name }) {
 }
 
 function Home(){
-  // rented movies + details
-  const [top_five_films, set_top_five_films] = useState([]);
-  // Returns the top 5 most rented movies + details
-  const [top_five_actors, set_top_five_actors] = useState([]);
-  // As a user I want to view a list of all customers + customer details
-  const [customers, set_customers] = useState([]);
+  const [topFiveFilms, setTopFiveFilms] = useState([]);
+  const [topFiveActors, setTopFiveActors] = useState([]);
+  const [films, setFilms] = useState([]);
 
   useEffect(() => {
-    getData();
+    getTopMovies();
+    getTopActors();
+    getFilms();
   }, []);
 
-  function getData() {
-    axios.get('/sakila') 
+  function getTopMovies() {
+    axios.get('/top_movies') 
       .then((response) => {
-        set_top_five_films(response.data.top_five_films);
-        set_top_five_actors(response.data.top_five_actors);
-        set_customers(response.data.customers);
+        setTopFiveFilms(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching top movies:', error);
+      });
+  }
+
+  function getTopActors() {
+    axios.get('/top_actors') 
+      .then((response) => {
+        setTopFiveActors(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching top actors:', error);
+      });
+  }
+
+  function getFilms() {
+    axios.get('/films') 
+      .then((response) => {
+        setFilms(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching top actors:', error);
       });
   }
 
@@ -87,18 +123,18 @@ function Home(){
       <div id="top_movies">
         <h1><br/>Top 5 Rented Films of All Time</h1>
         <CardGroup>
-          {top_five_films.map((film, index) => (
-            <Movie_Card
+          {topFiveFilms.map((film, index) => (
+            <MovieCard
               key={index}
               title={film.title}
               description={film.description}
-              release_year={film.release_year}
+              releaseYear={film.release_year}
               language={film.language} 
               duration={film.duration} 
               rating={film.rating}
-              special_features={film.special_features}
-              times_rented={film.times_rented} 
-              last_update={film.last_update} 
+              specialFeatures={film.special_features}
+              timesRented={film.times_rented} 
+              lastUpdate={film.last_update} 
             />
           ))}
         </CardGroup>
@@ -106,8 +142,32 @@ function Home(){
       <div id="top_actors">
         <h1><br/>Top 5 Actors That Feature in Films We Have in Store</h1>
         <CardGroup>
-          {top_five_actors.map((actor, index) => (
-            <Actor_Card first_name={actor.first_name} last_name={actor.last_name}/>
+          {topFiveActors.map((actor, index) => (
+            <ActorCard 
+              key={index} 
+              firstName={actor.first_name} 
+              lastName={actor.last_name} 
+              topMovies={actor.top_movies} 
+            />
+          ))}
+        </CardGroup>
+      </div>
+      <div id="all_films">
+        <h1><br/>All Films</h1>
+        <CardGroup>
+          {films.map((film, index) => (
+            <MovieCard
+              key={index}
+              title={film.title}
+              description={film.description}
+              releaseYear={film.release_year}
+              language={film.language} 
+              duration={film.duration} 
+              rating={film.rating}
+              specialFeatures={film.special_features}
+              timesRented={film.times_rented} 
+              lastUpdate={film.last_update} 
+            />
           ))}
         </CardGroup>
       </div>
