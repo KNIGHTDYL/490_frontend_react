@@ -25,7 +25,6 @@ function MovieCard({ title, description, releaseYear, language, duration, rating
               <p>Duration: {duration} minutes</p>
               <p>Rating: {rating}</p>
               <p>Special Features: {specialFeatures}</p>
-              <p>Times Rented: {timesRented}</p>
             </div>
           )}
           <Button variant="primary" onClick={() => setShowDetails(!showDetails)}>
@@ -33,14 +32,15 @@ function MovieCard({ title, description, releaseYear, language, duration, rating
           </Button>
         </Card.Body>
         <Card.Footer>
-          <small className="text-muted"> {lastUpdate} </small>
+          <p>Times Rented: {timesRented}</p>
+          <small className="text-muted">Last Update: {lastUpdate} </small>
         </Card.Footer>
       </Card>
     </CardGroup>
   );
 }
 
-function ActorCard({ firstName, lastName, topMovies }) {
+function ActorCard({ firstName, lastName, filmCount, topMovies }) {
   const [showMovies, setShowMovies] = useState(false);
 
   return (
@@ -49,27 +49,31 @@ function ActorCard({ firstName, lastName, topMovies }) {
         <Card.Body>
           <Card.Title>{firstName} {lastName}</Card.Title>
           <Button variant="primary" onClick={() => setShowMovies(!showMovies)}>
-            {showMovies ? 'Hide Movies' : 'More Info'}
+            {showMovies ? 'Hide Top Films' : 'Show Top Films'}
           </Button>
           {showMovies && (
             <div>
-              {topMovies.map((movie, index) => (
-                <MovieCard 
-                  key={index} 
-                  title={movie.title}
-                  description={movie.description}
-                  releaseYear={movie.release_year}
-                  language={movie.language_id} 
-                  duration={movie.length} 
-                  rating={movie.rating}
-                  specialFeatures={movie.special_features}
-                  timesRented={movie.rental_count} 
-                  lastUpdate={movie.last_update} 
+              <h4>Top Films:</h4>              
+              {topMovies.map((film, index) => (
+                <MovieCard
+                  key={index}
+                  title={film.title}
+                  description={film.description}
+                  releaseYear={film.release_year}
+                  language={film.language_name} 
+                  duration={film.length} 
+                  rating={film.rating}
+                  specialFeatures={film.special_features}
+                  timesRented={film.rental_count} 
+                  lastUpdate={film.last_update} 
                 />
               ))}
             </div>
           )}
         </Card.Body>
+        <Card.Footer>
+          <p>Films Featured in: {filmCount}</p>
+        </Card.Footer>
       </Card>
     </CardGroup>
   );
@@ -129,11 +133,11 @@ function Home(){
               title={film.title}
               description={film.description}
               releaseYear={film.release_year}
-              language={film.language} 
-              duration={film.duration} 
+              language={film.language_name} 
+              duration={film.length} 
               rating={film.rating}
               specialFeatures={film.special_features}
-              timesRented={film.times_rented} 
+              timesRented={film.rental_count} 
               lastUpdate={film.last_update} 
             />
           ))}
@@ -147,26 +151,8 @@ function Home(){
               key={index} 
               firstName={actor.first_name} 
               lastName={actor.last_name} 
+              filmCount={actor.films_featured_in} 
               topMovies={actor.top_movies} 
-            />
-          ))}
-        </CardGroup>
-      </div>
-      <div id="all_films">
-        <h1><br/>All Films</h1>
-        <CardGroup>
-          {films.map((film, index) => (
-            <MovieCard
-              key={index}
-              title={film.title}
-              description={film.description}
-              releaseYear={film.release_year}
-              language={film.language} 
-              duration={film.duration} 
-              rating={film.rating}
-              specialFeatures={film.special_features}
-              timesRented={film.times_rented} 
-              lastUpdate={film.last_update} 
             />
           ))}
         </CardGroup>
