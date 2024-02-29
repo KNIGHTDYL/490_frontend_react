@@ -87,6 +87,7 @@ function Customers() {
       return (
         customer.first_name.toLowerCase().includes(query.toLowerCase()) ||
         customer.last_name.toLowerCase().includes(query.toLowerCase()) ||
+        customer.email.toLowerCase().includes(query.toLowerCase()) ||
         customer.customer_id.toString().toLowerCase().includes(query.toLowerCase())
       );
     });

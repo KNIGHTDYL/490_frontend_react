@@ -19,3 +19,14 @@ Customer Page (7):
 • As a user I want to be able to delete a customer if they no longer wish to patron at store
 • As a user I want to be able to view customer details and see their past and present rental history
 • As a user I want to be able to indicate that a customer has returned a rented movie
+
+Video Deliverable Guideline
+•    Your video cannot be longer than 10 minutes
+•    You should run your front end and back end at the beginning of the video.
+•    You must record a live demonstration of your application.
+•    Recording MUST be uploaded onto youtube.com
+•    You may use your choice of recording software, but there should not be any water marking on the video. OBS studio is opensource and works very well and highly recommended.
+•    Audio & Video must be clear for full credit for video
+•    You should take the time to upload video into consideration. Video not uploaded before due date will result in 0 for the milestone.
+•    MS2 video will probably be less than 5-6 minutes
+•    MS3 must demonstrate all features (even ones completed in MS2)
