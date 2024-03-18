@@ -53,15 +53,14 @@ function SearchBar({ handleSearch }) {
         type="text"
         value={query}
         onChange={handleInputChange}
-        placeholder="Search by Customer ID, First Name, or Last Name
-        "
+        placeholder="Search by Customer ID, First Name, or Last Name"
         style={{ width: '100%', height: '40px', fontSize: '16px', marginBottom: '10px' }}
       />
     </div>
   );
 }
 
-function Customers() {
+const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage] = useState(25); // Number of customers per page
@@ -71,7 +70,7 @@ function Customers() {
     getCustomers();
   }, []);
 
-  function getCustomers() {
+  const getCustomers = () => {
     axios.get('/customers')
       .then((response) => {
         setCustomers(response.data.customers);
@@ -80,7 +79,7 @@ function Customers() {
       .catch((error) => {
         console.error('Error fetching customers:', error);
       });
-  }
+  };
 
   const handleSearch = (query) => {
     const filtered = customers.filter((customer) => {
@@ -104,6 +103,7 @@ function Customers() {
 
   return (
     <div className="Customers">
+      <CreateCustomer />
       <h1>Our Customer List</h1>
       <SearchBar handleSearch={handleSearch} />
       {currentCustomers.map((customer, index) => (
@@ -120,6 +120,55 @@ function Customers() {
       </ul>
     </div>
   );
-}
+};
+
+const CreateCustomer = () => {
+  const [successMessage, setSuccessMessage] = useState('');
+  const [formData, setFormData] = useState({
+    store_id: '',
+    first_name: '',
+    last_name: '',
+    email: '',
+    address_id: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/create_customer', formData);
+      console.log(response.data);
+      setSuccessMessage('Customer created successfully');
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      setSuccessMessage('Customer has not been created');
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 2000);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Create Customer</h2>
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="store_id" placeholder="Store ID" onChange={handleChange} />
+        <input type="text" name="first_name" placeholder="First Name" onChange={handleChange} />
+        <input type="text" name="last_name" placeholder="Last Name" onChange={handleChange} />
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
+        <input type="text" name="address_id" placeholder="Address ID" onChange={handleChange} />
+        <br />
+        <Button type="submit" variant="primary">Create Customer</Button>
+      </form>
+      {successMessage && <p>{successMessage}</p>}
+    </div>
+  );
+};
 
 export default Customers;
