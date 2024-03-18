@@ -2,9 +2,10 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
+import Home from '../pages/home';
 import Films from '../pages/films';
 import Customer from '../pages/customer';
-import Home from '../pages/home';
+import Movies from '../pages/rental';
 
 function NavBar() {
   return(
@@ -15,14 +16,16 @@ function NavBar() {
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/films">Films</Nav.Link>
-            <Nav.Link as={Link} to="/customer">Customer</Nav.Link>
+            <Nav.Link as={Link} to="/customer">Customers</Nav.Link>
+            <Nav.Link as={Link} to="/rental">Rentals</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
       <Routes>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/films' element={<Films/>}/>
-          <Route path='/customer' element={<Customer/>}/>
+      <Route path="/" element={<Home />} />
+        <Route path="/films" element={<Films />} />
+        <Route path="/customer" element={<Customer />} />
+        <Route path="/rental" element={<Movies />} />
       </Routes>
     </Router>
   );
